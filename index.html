@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MGSML SKY PROJECT - Headroom Affiliate</title>
+    <title>MGSML SKY PROJECT - Global Affiliate Hub</title>
 
     <style>
         :root {
@@ -30,7 +30,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 16px 14px 40px 14px;
+            padding: 16px 14px 42px 14px;
         }
 
         .container {
@@ -57,6 +57,7 @@
             font-weight: 900;
             color: var(--sky-accent);
             letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .brand-sub {
@@ -64,17 +65,25 @@
             color: var(--gold);
             font-weight: 700;
             margin-top: 2px;
+            letter-spacing: 0.3px;
         }
 
-        .admin-trigger-btn {
-            background: rgba(250, 204, 21, 0.14);
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            padding: 6px 10px;
-            border-radius: 10px;
+        .secret-dot-btn {
+            background: transparent;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            color: #94a3b8;
+            padding: 6px 9px;
+            border-radius: 9px;
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 700;
             cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .secret-dot-btn:hover {
+            opacity: 1;
+            border-color: var(--gold);
+            color: var(--gold);
         }
 
         .card {
@@ -209,6 +218,13 @@
             margin-top: 8px;
         }
 
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1.5px solid var(--danger);
+            color: #fca5a5;
+            margin-top: 8px;
+        }
+
         .status-msg {
             margin-top: 8px;
             font-size: 11px;
@@ -250,6 +266,27 @@
             line-height: 1.5;
         }
 
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9990;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 360px;
+            background: #061326;
+            border: 1.5px solid var(--gold);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85);
+        }
+
         .admin-panel {
             display: none;
             background: #04101f;
@@ -258,12 +295,24 @@
             padding: 16px;
         }
 
+        .admin-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
         .admin-title {
             font-size: 13px;
             font-weight: 900;
             color: var(--gold);
-            margin-bottom: 10px;
             text-transform: uppercase;
+        }
+
+        .admin-divider {
+            border: none;
+            border-top: 1px solid rgba(148, 163, 184, 0.22);
+            margin: 14px 0;
         }
 
         .toast {
@@ -289,39 +338,74 @@
         <div class="top-bar">
             <div>
                 <div class="brand-title">MGSML SKY PROJECT</div>
-                <div class="brand-sub">Headroom Affiliate • App Download • Sign Up</div>
+                <div class="brand-sub">Global Affiliate • App Download • Sign Up</div>
             </div>
-            <button class="admin-trigger-btn" onclick="toggleAdminPanel()">⚙️ Admin Link</button>
+            <button class="secret-dot-btn" onclick="openAdminGateway()" title="Admin Gateway">•••</button>
         </div>
 
+        <!-- Secret Admin Login Modal -->
+        <div class="modal-backdrop" id="adminLoginModal">
+            <div class="modal-box">
+                <div class="admin-title" style="margin-bottom: 8px;">Admin Gateway</div>
+                <p class="step-note">Enter your admin password / PIN to unlock settings.</p>
+
+                <div class="form-group">
+                    <label class="form-label">Admin Password / PIN</label>
+                    <input type="password" id="adminPasswordInput" class="input-field" placeholder="Enter password or PIN" onkeydown="if(event.key==='Enter') verifyAdminLogin()">
+                </div>
+
+                <button class="btn btn-signup" onclick="verifyAdminLogin()">Login</button>
+                <button class="btn btn-secondary" onclick="closeAdminGateway()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Authenticated Secret Admin Panel -->
         <div class="admin-panel" id="affiliateAdminPanel">
-            <div class="admin-title">Affiliate Link Manager (Admin)</div>
-            <p class="step-note">ডাউনলোড লিংক তৈরি হলে বা পরিবর্তন করার প্রয়োজন হলে এখান থেকে লিংক বসিয়ে Save করুন।</p>
+            <div class="admin-header-row">
+                <div class="admin-title">Affiliate Admin Panel</div>
+                <button class="mini-btn" onclick="logoutAdminPanel()">Logout</button>
+            </div>
+            <p class="step-note">Configure download link, sign-up link, referral ID, or change admin password.</p>
 
             <div class="form-group">
-                <label class="form-label">Android App Download Link (Currently Blank / Editable):</label>
+                <label class="form-label">Android App Download URL (Blank / Editable):</label>
                 <input type="text" id="adminDownloadUrl" class="input-field" placeholder="Paste App Download URL here (leave blank for now)">
             </div>
 
             <div class="form-group">
-                <label class="form-label">Sign Up / Headroom Link:</label>
+                <label class="form-label">Sign Up / Headroom URL:</label>
                 <input type="text" id="adminSignupUrl" class="input-field" placeholder="https://mgsml-sky.github.io/mgsml-mining-headroom/">
             </div>
 
             <div class="form-group">
-                <label class="form-label">Custom Share ID (Optional override):</label>
+                <label class="form-label">Default / Override Sponsor ID:</label>
                 <input type="text" id="adminCustomRefId" class="input-field" placeholder="e.g. MGSML2000">
             </div>
 
-            <button class="btn btn-signup" onclick="saveAffiliateSettings()">💾 Save Affiliate Links</button>
-            <button class="btn btn-secondary" onclick="resetAffiliateSettings()">↺ Reset to Default</button>
+            <button class="btn btn-signup" onclick="saveAffiliateSettings()">Save Link Settings</button>
+            <button class="btn btn-secondary" onclick="resetAffiliateSettings()">Reset Default Links</button>
+
+            <hr class="admin-divider">
+
+            <div class="step-title">Change Admin Password / PIN</div>
+            <div class="form-group">
+                <label class="form-label">Current Password / PIN</label>
+                <input type="password" id="currentAdminPassInput" class="input-field" placeholder="Enter current password / PIN">
+            </div>
+            <div class="form-group">
+                <label class="form-label">New Password / PIN (Min 3 chars)</label>
+                <input type="password" id="newAdminPassInput" class="input-field" placeholder="Enter new password / PIN">
+            </div>
+            <button class="btn btn-download" onclick="changeAdminPassword()">Update Password</button>
+            <button class="btn btn-danger" onclick="logoutAdminPanel()">Lock & Logout Admin</button>
         </div>
 
+        <!-- Main Affiliate & Onboarding Card -->
         <div class="card">
-            <span class="hero-badge">Official Headroom Affiliate</span>
+            <span class="hero-badge">Official Global Affiliate</span>
             <h1 class="hero-title">Join MGSML SKY PROJECT</h1>
             <p class="hero-desc">
-                আগে Android অ্যাপটি ডাউনলোড করুন, তারপর রেফারেল আইডি ব্যবহার করে সাইন আপ সম্পন্ন করুন।
+                Download the Android app first, then complete your sign up using the sponsor referral ID.
             </p>
 
             <div class="sponsor-box">
@@ -329,29 +413,32 @@
                     <div class="sponsor-label">Sponsor / Referral ID</div>
                     <div class="sponsor-id" id="displayRefId">MGSML2000</div>
                 </div>
-                <button class="mini-btn" onclick="copyReferralId()">📋 Copy ID</button>
+                <button class="mini-btn" onclick="copyReferralId()">Copy ID</button>
             </div>
 
+            <!-- Step 1: Download First -->
             <div class="step-title">Step 1: Download Android App</div>
             <p class="step-note">
-                ডাউনলোড বাটনটি এখন খালি/পরিবর্তনযোগ্য রাখা হয়েছে। লিংক যুক্ত হলে এখান থেকেই সরাসরি অ্যাপ ডাউনলোড করা যাবে।
+                The download link is currently blank and ready to be configured anytime from the admin panel once your download URL is ready.
             </p>
-            <button class="btn btn-download" onclick="handleDownloadClick()">⬇️ Download Android App</button>
+            <button class="btn btn-download" onclick="handleDownloadClick()">Download Android App</button>
             <div class="status-msg" id="downloadStatusBox"></div>
 
-            <hr style="border: none; border-top: 1px solid rgba(148, 163, 184, 0.25); margin: 16px 0;">
+            <hr class="admin-divider">
 
+            <!-- Step 2: Sign Up After Download -->
             <div class="step-title">Step 2: Sign Up Now</div>
             <p class="step-note">
-                অ্যাপ ডাউনলোড/ইনস্টলের পর সাইন আপ পেজে গিয়ে উপরের Sponsor / Referral ID ব্যবহার করে অ্যাকাউন্ট তৈরি করুন।
+                After downloading and installing the app, proceed to sign up and use the Sponsor / Referral ID shown above.
             </p>
-            <button class="btn btn-signup" onclick="handleSignupClick()">🚀 Sign Up Now</button>
+            <button class="btn btn-signup" onclick="handleSignupClick()">Sign Up Now</button>
         </div>
 
+        <!-- Share Message & Referral Link Card -->
         <div class="card">
             <div class="step-title">Share Your Affiliate Invite</div>
             <p class="step-note">
-                আপনার আইডি নম্বর যুক্ত রেফারেল লিংক ও সুন্দর ইনভাইট মেসেজ নিচে তৈরি হয়েছে—সহজে কপি বা শেয়ার করুন।
+                Your referral link and invite message include your ID automatically. Share or copy with one tap.
             </p>
 
             <div class="form-group">
@@ -364,15 +451,17 @@
                 <textarea id="inviteMessageBox" class="message-box" readonly></textarea>
             </div>
 
-            <button class="btn btn-share" onclick="shareInvite()">📤 Share Invite (WhatsApp / Apps)</button>
-            <button class="btn btn-secondary" onclick="copyInviteMessage()">📋 Copy Invite Message & Link</button>
+            <button class="btn btn-share" onclick="shareInvite()">Share Invite</button>
+            <button class="btn btn-secondary" onclick="copyInviteMessage()">Copy Invite Message & Link</button>
         </div>
     </div>
 
     <div class="toast" id="toastBox"></div>
 
     <script>
-        const STORAGE_KEY = "mgsml_sky_affiliate_config_v1";
+        const CONFIG_KEY = "mgsml_sky_affiliate_config_v2";
+        const AUTH_KEY = "mgsml_sky_affiliate_admin_pass_v1";
+        const SESSION_KEY = "mgsml_sky_affiliate_admin_logged_in";
 
         const defaultConfig = {
             appDownloadUrl: "",
@@ -383,9 +472,21 @@
         let affiliateConfig = loadConfig();
         let activeRefId = resolveReferralId();
 
+        function getAdminPassword() {
+            return localStorage.getItem(AUTH_KEY) || "1234";
+        }
+
+        function setAdminPassword(newPass) {
+            localStorage.setItem(AUTH_KEY, newPass);
+        }
+
+        function isAdminLoggedIn() {
+            return sessionStorage.getItem(SESSION_KEY) === "true";
+        }
+
         function loadConfig() {
             try {
-                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                const saved = JSON.parse(localStorage.getItem(CONFIG_KEY));
                 return Object.assign({}, defaultConfig, saved || {});
             } catch (e) {
                 return Object.assign({}, defaultConfig);
@@ -416,14 +517,14 @@
 
         function buildInviteMessage(refId, refUrl) {
             return [
-                "🌟 *MGSML SKY PROJECT* — Official Invitation",
+                "MGSML SKY PROJECT - Official Invitation",
                 "",
-                `🆔 *Sponsor / Referral ID:* ${refId}`,
+                `Sponsor / Referral ID: ${refId}`,
                 "",
-                "📲 *ধাপ ১:* প্রথমে MGSML SKY Android অ্যাপটি ডাউনলোড ও ইনস্টল করুন।",
-                "✍️ *ধাপ ২:* এরপর সাইন আপ করুন এবং উপরের Referral ID ব্যবহার করুন।",
+                "Step 1: Download and install the MGSML SKY Android app first.",
+                "Step 2: Sign up and enter the Sponsor / Referral ID above.",
                 "",
-                `🔗 *Invite Link:* ${refUrl}`
+                `Invite Link: ${refUrl}`
             ].join("\n");
         }
 
@@ -439,6 +540,67 @@
             document.getElementById("adminDownloadUrl").value = affiliateConfig.appDownloadUrl || "";
             document.getElementById("adminSignupUrl").value = affiliateConfig.signupUrl || defaultConfig.signupUrl;
             document.getElementById("adminCustomRefId").value = affiliateConfig.customRefId || "";
+
+            document.getElementById("affiliateAdminPanel").style.display = isAdminLoggedIn() ? "block" : "none";
+        }
+
+        function openAdminGateway() {
+            if (isAdminLoggedIn()) {
+                document.getElementById("affiliateAdminPanel").style.display = "block";
+                return;
+            }
+            const passInput = document.getElementById("adminPasswordInput");
+            passInput.value = "";
+            document.getElementById("adminLoginModal").style.display = "flex";
+            setTimeout(() => passInput.focus(), 50);
+        }
+
+        function closeAdminGateway() {
+            document.getElementById("adminPasswordInput").value = "";
+            document.getElementById("adminLoginModal").style.display = "none";
+        }
+
+        function verifyAdminLogin() {
+            const entered = document.getElementById("adminPasswordInput").value;
+            if (entered === getAdminPassword()) {
+                sessionStorage.setItem(SESSION_KEY, "true");
+                closeAdminGateway();
+                document.getElementById("affiliateAdminPanel").style.display = "block";
+                showToast("Admin unlocked");
+            } else {
+                showToast("Invalid password or PIN");
+            }
+        }
+
+        function logoutAdminPanel() {
+            sessionStorage.removeItem(SESSION_KEY);
+            document.getElementById("affiliateAdminPanel").style.display = "none";
+            document.getElementById("currentAdminPassInput").value = "";
+            document.getElementById("newAdminPassInput").value = "";
+            showToast("Admin logged out");
+        }
+
+        function changeAdminPassword() {
+            if (!isAdminLoggedIn()) {
+                showToast("Please login as admin first");
+                return;
+            }
+            const currentVal = document.getElementById("currentAdminPassInput").value;
+            const newVal = document.getElementById("newAdminPassInput").value.trim();
+
+            if (currentVal !== getAdminPassword()) {
+                showToast("Current password or PIN is incorrect");
+                return;
+            }
+            if (!newVal || newVal.length < 3) {
+                showToast("New password must be at least 3 characters");
+                return;
+            }
+
+            setAdminPassword(newVal);
+            document.getElementById("currentAdminPassInput").value = "";
+            document.getElementById("newAdminPassInput").value = "";
+            showToast("Admin password updated");
         }
 
         function handleDownloadClick() {
@@ -447,7 +609,7 @@
 
             if (!dlUrl) {
                 statusBox.style.display = "block";
-                statusBox.textContent = "ডাউনলোড লিংকটি বর্তমানে খালি রাখা হয়েছে। লিংক তৈরি হলে অ্যাডমিন প্যানেল থেকে যুক্ত করে সরাসরি ডাউনলোড চালু করা যাবে।";
+                statusBox.textContent = "Download URL is currently blank. Once your download link is ready, add it in the Admin Panel.";
                 showToast("Download link is currently blank");
                 return;
             }
@@ -464,12 +626,12 @@
         }
 
         function copyReferralId() {
-            copyText(activeRefId, `Referral ID (${activeRefId}) copied!`);
+            copyText(activeRefId, `Referral ID (${activeRefId}) copied`);
         }
 
         function copyInviteMessage() {
             const text = document.getElementById("inviteMessageBox").value;
-            copyText(text, "Invite message & referral link copied!");
+            copyText(text, "Invite message and link copied");
         }
 
         async function shareInvite() {
@@ -512,24 +674,26 @@
             showToast(successMessage);
         }
 
-        function toggleAdminPanel() {
-            const panel = document.getElementById("affiliateAdminPanel");
-            const isVisible = panel.style.display === "block";
-            panel.style.display = isVisible ? "none" : "block";
-        }
-
         function saveAffiliateSettings() {
+            if (!isAdminLoggedIn()) {
+                showToast("Please login as admin first");
+                return;
+            }
             affiliateConfig.appDownloadUrl = document.getElementById("adminDownloadUrl").value.trim();
             affiliateConfig.signupUrl = document.getElementById("adminSignupUrl").value.trim() || defaultConfig.signupUrl;
             affiliateConfig.customRefId = document.getElementById("adminCustomRefId").value.trim().toUpperCase();
 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(affiliateConfig));
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(affiliateConfig));
             refreshUI();
-            showToast("Affiliate settings saved!");
+            showToast("Affiliate settings saved");
         }
 
         function resetAffiliateSettings() {
-            localStorage.removeItem(STORAGE_KEY);
+            if (!isAdminLoggedIn()) {
+                showToast("Please login as admin first");
+                return;
+            }
+            localStorage.removeItem(CONFIG_KEY);
             localStorage.removeItem("mgsml_last_ref_id");
             affiliateConfig = Object.assign({}, defaultConfig);
             refreshUI();
