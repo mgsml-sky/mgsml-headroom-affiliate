@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MGSML SKY PROJECT - Headroom Affiliate</title>
+
+    <style>
+        :root {
+            --bg-dark: #03162b;
+            --bg-card: #082f49;
+            --sky-primary: #0284c7;
+            --sky-accent: #38bdf8;
+            --gold: #facc15;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #020b18 0%, #082f49 55%, #03162b 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 14px 40px 14px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .top-bar {
+            background: rgba(8, 47, 73, 0.95);
+            border: 1.5px solid rgba(56, 189, 248, 0.45);
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+        }
+
+        .brand-title {
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--sky-accent);
+            letter-spacing: 0.5px;
+        }
+
+        .brand-sub {
+            font-size: 10px;
+            color: var(--gold);
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .admin-trigger-btn {
+            background: rgba(250, 204, 21, 0.14);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #082f49, #03162b);
+            border: 2px solid rgba(14, 165, 233, 0.55);
+            border-radius: 18px;
+            padding: 18px 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.16);
+            border: 1px solid var(--sky-accent);
+            color: var(--sky-accent);
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: 20px;
+            font-weight: 900;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .hero-desc {
+            font-size: 12.5px;
+            color: #bae6fd;
+            line-height: 1.55;
+            margin-bottom: 14px;
+        }
+
+        .sponsor-box {
+            background: #020b18;
+            border: 1.5px dashed var(--gold);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sponsor-label {
+            font-size: 10px;
+            color: #93c5fd;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .sponsor-id {
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--gold);
+            margin-top: 2px;
+        }
+
+        .mini-btn {
+            background: #0369a1;
+            border: 1px solid var(--sky-accent);
+            color: #ffffff;
+            padding: 7px 11px;
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .step-title {
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.4px;
+        }
+
+        .step-note {
+            font-size: 11.5px;
+            color: #cbd5e1;
+            line-height: 1.45;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            font-size: 13px;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #facc15, #f59e0b);
+            color: #090d16;
+            box-shadow: 0 6px 18px rgba(250, 204, 21, 0.28);
+        }
+
+        .btn-signup {
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            color: #ffffff;
+            margin-top: 8px;
+            box-shadow: 0 6px 18px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-share {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #ffffff;
+            margin-top: 8px;
+        }
+
+        .btn-secondary {
+            background: #020b18;
+            border: 1.5px solid var(--sky-primary);
+            color: var(--sky-accent);
+            margin-top: 8px;
+        }
+
+        .status-msg {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #fde68a;
+            background: rgba(2, 11, 24, 0.75);
+            border: 1px solid rgba(250, 204, 21, 0.35);
+            padding: 8px 10px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            color: #bae6fd;
+            margin-bottom: 4px;
+        }
+
+        .input-field,
+        .message-box {
+            width: 100%;
+            background: #020b18;
+            border: 1.5px solid #0284c7;
+            color: #ffffff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 12px;
+        }
+
+        .message-box {
+            min-height: 125px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .admin-panel {
+            display: none;
+            background: #04101f;
+            border: 2px solid var(--gold);
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .admin-title {
+            font-size: 13px;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            border: 1.5px solid var(--sky-accent);
+            color: #ffffff;
+            padding: 9px 16px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <div>
+                <div class="brand-title">MGSML SKY PROJECT</div>
+                <div class="brand-sub">Headroom Affiliate • App Download • Sign Up</div>
+            </div>
+            <button class="admin-trigger-btn" onclick="toggleAdminPanel()">⚙️ Admin Link</button>
+        </div>
+
+        <div class="admin-panel" id="affiliateAdminPanel">
+            <div class="admin-title">Affiliate Link Manager (Admin)</div>
+            <p class="step-note">ডাউনলোড লিংক তৈরি হলে বা পরিবর্তন করার প্রয়োজন হলে এখান থেকে লিংক বসিয়ে Save করুন।</p>
+
+            <div class="form-group">
+                <label class="form-label">Android App Download Link (Currently Blank / Editable):</label>
+                <input type="text" id="adminDownloadUrl" class="input-field" placeholder="Paste App Download URL here (leave blank for now)">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Sign Up / Headroom Link:</label>
+                <input type="text" id="adminSignupUrl" class="input-field" placeholder="https://mgsml-sky.github.io/mgsml-mining-headroom/">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Custom Share ID (Optional override):</label>
+                <input type="text" id="adminCustomRefId" class="input-field" placeholder="e.g. MGSML2000">
+            </div>
+
+            <button class="btn btn-signup" onclick="saveAffiliateSettings()">💾 Save Affiliate Links</button>
+            <button class="btn btn-secondary" onclick="resetAffiliateSettings()">↺ Reset to Default</button>
+        </div>
+
+        <div class="card">
+            <span class="hero-badge">Official Headroom Affiliate</span>
+            <h1 class="hero-title">Join MGSML SKY PROJECT</h1>
+            <p class="hero-desc">
+                আগে Android অ্যাপটি ডাউনলোড করুন, তারপর রেফারেল আইডি ব্যবহার করে সাইন আপ সম্পন্ন করুন।
+            </p>
+
+            <div class="sponsor-box">
+                <div>
+                    <div class="sponsor-label">Sponsor / Referral ID</div>
+                    <div class="sponsor-id" id="displayRefId">MGSML2000</div>
+                </div>
+                <button class="mini-btn" onclick="copyReferralId()">📋 Copy ID</button>
+            </div>
+
+            <div class="step-title">Step 1: Download Android App</div>
+            <p class="step-note">
+                ডাউনলোড বাটনটি এখন খালি/পরিবর্তনযোগ্য রাখা হয়েছে। লিংক যুক্ত হলে এখান থেকেই সরাসরি অ্যাপ ডাউনলোড করা যাবে।
+            </p>
+            <button class="btn btn-download" onclick="handleDownloadClick()">⬇️ Download Android App</button>
+            <div class="status-msg" id="downloadStatusBox"></div>
+
+            <hr style="border: none; border-top: 1px solid rgba(148, 163, 184, 0.25); margin: 16px 0;">
+
+            <div class="step-title">Step 2: Sign Up Now</div>
+            <p class="step-note">
+                অ্যাপ ডাউনলোড/ইনস্টলের পর সাইন আপ পেজে গিয়ে উপরের Sponsor / Referral ID ব্যবহার করে অ্যাকাউন্ট তৈরি করুন।
+            </p>
+            <button class="btn btn-signup" onclick="handleSignupClick()">🚀 Sign Up Now</button>
+        </div>
+
+        <div class="card">
+            <div class="step-title">Share Your Affiliate Invite</div>
+            <p class="step-note">
+                আপনার আইডি নম্বর যুক্ত রেফারেল লিংক ও সুন্দর ইনভাইট মেসেজ নিচে তৈরি হয়েছে—সহজে কপি বা শেয়ার করুন।
+            </p>
+
+            <div class="form-group">
+                <label class="form-label">Your Referral Link:</label>
+                <input type="text" id="referralLinkInput" class="input-field" readonly>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Invite Message (With Your ID):</label>
+                <textarea id="inviteMessageBox" class="message-box" readonly></textarea>
+            </div>
+
+            <button class="btn btn-share" onclick="shareInvite()">📤 Share Invite (WhatsApp / Apps)</button>
+            <button class="btn btn-secondary" onclick="copyInviteMessage()">📋 Copy Invite Message & Link</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toastBox"></div>
+
+    <script>
+        const STORAGE_KEY = "mgsml_sky_affiliate_config_v1";
+
+        const defaultConfig = {
+            appDownloadUrl: "",
+            signupUrl: "https://mgsml-sky.github.io/mgsml-mining-headroom/",
+            defaultRefId: "MGSML2000"
+        };
+
+        let affiliateConfig = loadConfig();
+        let activeRefId = resolveReferralId();
+
+        function loadConfig() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                return Object.assign({}, defaultConfig, saved || {});
+            } catch (e) {
+                return Object.assign({}, defaultConfig);
+            }
+        }
+
+        function resolveReferralId() {
+            const params = new URLSearchParams(window.location.search);
+            const urlRef = (params.get("ref") || params.get("uid") || "").trim().toUpperCase();
+            if (urlRef) {
+                localStorage.setItem("mgsml_last_ref_id", urlRef);
+                return urlRef;
+            }
+            if (affiliateConfig.customRefId && affiliateConfig.customRefId.trim()) {
+                return affiliateConfig.customRefId.trim().toUpperCase();
+            }
+            const storedRef = (localStorage.getItem("mgsml_last_ref_id") || "").trim().toUpperCase();
+            return storedRef || affiliateConfig.defaultRefId;
+        }
+
+        function buildReferralUrl(refId) {
+            const baseUrl = window.location.origin && window.location.origin !== "null"
+                ? (window.location.origin + window.location.pathname)
+                : "https://mgsml-sky.github.io/mgsml-headroom-affiliate/";
+            const cleanBase = baseUrl.split("?")[0];
+            return `${cleanBase}?ref=${encodeURIComponent(refId)}`;
+        }
+
+        function buildInviteMessage(refId, refUrl) {
+            return [
+                "🌟 *MGSML SKY PROJECT* — Official Invitation",
+                "",
+                `🆔 *Sponsor / Referral ID:* ${refId}`,
+                "",
+                "📲 *ধাপ ১:* প্রথমে MGSML SKY Android অ্যাপটি ডাউনলোড ও ইনস্টল করুন।",
+                "✍️ *ধাপ ২:* এরপর সাইন আপ করুন এবং উপরের Referral ID ব্যবহার করুন।",
+                "",
+                `🔗 *Invite Link:* ${refUrl}`
+            ].join("\n");
+        }
+
+        function refreshUI() {
+            activeRefId = resolveReferralId();
+            const refUrl = buildReferralUrl(activeRefId);
+            const inviteText = buildInviteMessage(activeRefId, refUrl);
+
+            document.getElementById("displayRefId").textContent = activeRefId;
+            document.getElementById("referralLinkInput").value = refUrl;
+            document.getElementById("inviteMessageBox").value = inviteText;
+
+            document.getElementById("adminDownloadUrl").value = affiliateConfig.appDownloadUrl || "";
+            document.getElementById("adminSignupUrl").value = affiliateConfig.signupUrl || defaultConfig.signupUrl;
+            document.getElementById("adminCustomRefId").value = affiliateConfig.customRefId || "";
+        }
+
+        function handleDownloadClick() {
+            const statusBox = document.getElementById("downloadStatusBox");
+            const dlUrl = (affiliateConfig.appDownloadUrl || "").trim();
+
+            if (!dlUrl) {
+                statusBox.style.display = "block";
+                statusBox.textContent = "ডাউনলোড লিংকটি বর্তমানে খালি রাখা হয়েছে। লিংক তৈরি হলে অ্যাডমিন প্যানেল থেকে যুক্ত করে সরাসরি ডাউনলোড চালু করা যাবে।";
+                showToast("Download link is currently blank");
+                return;
+            }
+
+            statusBox.style.display = "none";
+            window.open(dlUrl, "_blank");
+        }
+
+        function handleSignupClick() {
+            const rawSignup = (affiliateConfig.signupUrl || defaultConfig.signupUrl).trim();
+            const separator = rawSignup.includes("?") ? "&" : "?";
+            const finalSignupUrl = `${rawSignup}${separator}ref=${encodeURIComponent(activeRefId)}`;
+            window.location.href = finalSignupUrl;
+        }
+
+        function copyReferralId() {
+            copyText(activeRefId, `Referral ID (${activeRefId}) copied!`);
+        }
+
+        function copyInviteMessage() {
+            const text = document.getElementById("inviteMessageBox").value;
+            copyText(text, "Invite message & referral link copied!");
+        }
+
+        async function shareInvite() {
+            const text = document.getElementById("inviteMessageBox").value;
+            const refUrl = document.getElementById("referralLinkInput").value;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: "MGSML SKY PROJECT Invite",
+                        text: text,
+                        url: refUrl
+                    });
+                    return;
+                } catch (err) {
+                }
+            }
+
+            const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(waUrl, "_blank");
+        }
+
+        function copyText(value, successMessage) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(value)
+                    .then(() => showToast(successMessage))
+                    .catch(() => fallbackCopy(value, successMessage));
+            } else {
+                fallbackCopy(value, successMessage);
+            }
+        }
+
+        function fallbackCopy(value, successMessage) {
+            const temp = document.createElement("textarea");
+            temp.value = value;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+            showToast(successMessage);
+        }
+
+        function toggleAdminPanel() {
+            const panel = document.getElementById("affiliateAdminPanel");
+            const isVisible = panel.style.display === "block";
+            panel.style.display = isVisible ? "none" : "block";
+        }
+
+        function saveAffiliateSettings() {
+            affiliateConfig.appDownloadUrl = document.getElementById("adminDownloadUrl").value.trim();
+            affiliateConfig.signupUrl = document.getElementById("adminSignupUrl").value.trim() || defaultConfig.signupUrl;
+            affiliateConfig.customRefId = document.getElementById("adminCustomRefId").value.trim().toUpperCase();
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(affiliateConfig));
+            refreshUI();
+            showToast("Affiliate settings saved!");
+        }
+
+        function resetAffiliateSettings() {
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem("mgsml_last_ref_id");
+            affiliateConfig = Object.assign({}, defaultConfig);
+            refreshUI();
+            showToast("Reset to default settings");
+        }
+
+        let toastTimer = null;
+        function showToast(msg) {
+            const toast = document.getElementById("toastBox");
+            toast.textContent = msg;
+            toast.style.display = "block";
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.style.display = "none";
+            }, 2400);
+        }
+
+        window.addEventListener("DOMContentLoaded", refreshUI);
+    </script>
+</body>
+</html>
