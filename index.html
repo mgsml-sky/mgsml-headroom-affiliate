@@ -68,6 +68,22 @@
             letter-spacing: 0.3px;
         }
 
+        .sync-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.16);
+            border: 1px solid rgba(16, 185, 129, 0.45);
+            color: #6ee7b7;
+            margin-right: 6px;
+        }
+
+        .top-right-actions {
+            display: flex;
+            align-items: center;
+        }
+
         .secret-dot-btn {
             background: transparent;
             border: 1px solid rgba(148, 163, 184, 0.25);
@@ -186,6 +202,9 @@
             cursor: pointer;
             letter-spacing: 0.5px;
             transition: transform 0.15s ease, opacity 0.15s ease;
+            display: block;
+            text-align: center;
+            text-decoration: none;
         }
 
         .btn:active {
@@ -234,6 +253,13 @@
             padding: 8px 10px;
             border-radius: 10px;
             display: none;
+        }
+
+        .quick-share-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
         }
 
         .form-group {
@@ -340,7 +366,10 @@
                 <div class="brand-title">MGSML SKY PROJECT</div>
                 <div class="brand-sub">Global Affiliate • App Download • Sign Up</div>
             </div>
-            <button class="secret-dot-btn" onclick="openAdminGateway()" title="Admin Gateway">•••</button>
+            <div class="top-right-actions">
+                <span class="sync-badge" id="syncStatusBadge">LOCAL</span>
+                <button class="secret-dot-btn" onclick="openAdminGateway()" title="Admin Gateway">•••</button>
+            </div>
         </div>
 
         <!-- Secret Admin Login Modal -->
@@ -365,7 +394,7 @@
                 <div class="admin-title">Affiliate Admin Panel</div>
                 <button class="mini-btn" onclick="logoutAdminPanel()">Logout</button>
             </div>
-            <p class="step-note">Configure download link, sign-up link, referral ID, or change admin password.</p>
+            <p class="step-note">Configure download link, sign-up link, referral ID, share message template, or change admin password.</p>
 
             <div class="form-group">
                 <label class="form-label">Android App Download URL (Blank / Editable):</label>
@@ -373,7 +402,7 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Sign Up / Headroom URL:</label>
+                <label class="form-label">Sign Up / Head Page URL:</label>
                 <input type="text" id="adminSignupUrl" class="input-field" placeholder="https://mgsml-sky.github.io/mgsml-mining-headroom/">
             </div>
 
@@ -382,8 +411,13 @@
                 <input type="text" id="adminCustomRefId" class="input-field" placeholder="e.g. MGSML2000">
             </div>
 
-            <button class="btn btn-signup" onclick="saveAffiliateSettings()">Save Link Settings</button>
-            <button class="btn btn-secondary" onclick="resetAffiliateSettings()">Reset Default Links</button>
+            <div class="form-group">
+                <label class="form-label">Custom Share Invite Message Template (Use {{REF_ID}} and {{LINK}}):</label>
+                <textarea id="adminInviteTemplate" class="message-box" placeholder="Write your custom invite message here..."></textarea>
+            </div>
+
+            <button class="btn btn-signup" onclick="saveAffiliateSettings()">Save Settings to Firebase</button>
+            <button class="btn btn-secondary" onclick="resetAffiliateSettings()">Reset Default Settings</button>
 
             <hr class="admin-divider">
 
@@ -442,35 +476,110 @@
             </p>
 
             <div class="form-group">
-                <label class="form-label">Your Referral Link:</label>
+                <label class="form-label">Your Referral / Sign Up Link:</label>
                 <input type="text" id="referralLinkInput" class="input-field" readonly>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Invite Message (With Your ID):</label>
+                <label class="form-label">Invite Message (Controlled by Admin + Your Link):</label>
                 <textarea id="inviteMessageBox" class="message-box" readonly></textarea>
             </div>
 
             <button class="btn btn-share" onclick="shareInvite()">Share Invite</button>
+
+            <div class="quick-share-row">
+                <a id="whatsappDirectLink" href="#" class="btn btn-secondary" style="margin-top:0;">WhatsApp</a>
+                <a id="telegramDirectLink" href="#" class="btn btn-secondary" style="margin-top:0;">Telegram</a>
+            </div>
+
             <button class="btn btn-secondary" onclick="copyInviteMessage()">Copy Invite Message & Link</button>
         </div>
     </div>
 
     <div class="toast" id="toastBox"></div>
 
+    <!-- Firebase Compat SDKs (Realtime Database) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
     <script>
-        const CONFIG_KEY = "mgsml_sky_affiliate_config_v2";
+        const CONFIG_KEY = "mgsml_sky_affiliate_config_v3";
         const AUTH_KEY = "mgsml_sky_affiliate_admin_pass_v1";
         const SESSION_KEY = "mgsml_sky_affiliate_admin_logged_in";
+
+        const defaultInviteTemplate = [
+            "MGSML SKY PROJECT - Official Invitation",
+            "",
+            "Sponsor / Referral ID: {{REF_ID}}",
+            "",
+            "Step 1: Download and install the MGSML SKY app first.",
+            "Step 2: Sign up using the link & Sponsor / Referral ID above.",
+            "",
+            "Sign Up Link: {{LINK}}"
+        ].join("\n");
 
         const defaultConfig = {
             appDownloadUrl: "",
             signupUrl: "https://mgsml-sky.github.io/mgsml-mining-headroom/",
-            defaultRefId: "MGSML2000"
+            defaultRefId: "MGSML2000",
+            customRefId: "",
+            inviteTemplate: defaultInviteTemplate
         };
+
+        // আপনার হেড পেজের Firebase config এখানে বসালে সাথে সাথে Firebase Realtime Database-এর সাথে সিঙ্ক হবে
+        // উদাহরণ:
+        // const FIREBASE_CONFIG = {
+        //     apiKey: "YOUR_API_KEY",
+        //     authDomain: "YOUR_PROJECT.firebaseapp.com",
+        //     databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+        //     projectId: "YOUR_PROJECT_ID",
+        //     appId: "YOUR_APP_ID"
+        // };
+        const FIREBASE_CONFIG = null;
 
         let affiliateConfig = loadConfig();
         let activeRefId = resolveReferralId();
+        let firebaseDbRef = null;
+
+        function setSyncBadge(text, isOnline) {
+            const badge = document.getElementById("syncStatusBadge");
+            if (!badge) return;
+            badge.textContent = text;
+            badge.style.background = isOnline ? "rgba(16, 185, 129, 0.16)" : "rgba(250, 204, 21, 0.14)";
+            badge.style.borderColor = isOnline ? "rgba(16, 185, 129, 0.5)" : "rgba(250, 204, 21, 0.4)";
+            badge.style.color = isOnline ? "#6ee7b7" : "#fde68a";
+        }
+
+        function initFirebaseSync() {
+            if (!FIREBASE_CONFIG || typeof firebase === "undefined") {
+                setSyncBadge("LOCAL", false);
+                return;
+            }
+            try {
+                const appInstance = firebase.apps.length
+                    ? firebase.app()
+                    : firebase.initializeApp(FIREBASE_CONFIG);
+
+                const db = firebase.database(appInstance);
+                firebaseDbRef = db.ref("mgsml_sky_project/affiliate_hub");
+                setSyncBadge("FIREBASE", true);
+
+                firebaseDbRef.on("value", (snapshot) => {
+                    const remoteData = snapshot.val();
+                    if (remoteData && typeof remoteData === "object") {
+                        affiliateConfig = Object.assign({}, defaultConfig, remoteData);
+                        localStorage.setItem(CONFIG_KEY, JSON.stringify(affiliateConfig));
+                        refreshUI();
+                    }
+                }, (err) => {
+                    console.warn("Firebase read error:", err);
+                    setSyncBadge("LOCAL", false);
+                });
+            } catch (err) {
+                console.warn("Firebase init error:", err);
+                setSyncBadge("LOCAL", false);
+            }
+        }
 
         function getAdminPassword() {
             return localStorage.getItem(AUTH_KEY) || "1234";
@@ -507,39 +616,51 @@
             return storedRef || affiliateConfig.defaultRefId;
         }
 
-        function buildReferralUrl(refId) {
-            const baseUrl = window.location.origin && window.location.origin !== "null"
-                ? (window.location.origin + window.location.pathname)
-                : "https://mgsml-sky.github.io/mgsml-headroom-affiliate/";
-            const cleanBase = baseUrl.split("?")[0];
-            return `${cleanBase}?ref=${encodeURIComponent(refId)}`;
+        // সাইন আপ / মূল পেজের লিংকের সাথে রেফারেল আইডি যুক্ত করা
+        function buildSignupReferralUrl(refId) {
+            const rawSignup = (affiliateConfig.signupUrl || defaultConfig.signupUrl).trim();
+            const separator = rawSignup.includes("?") ? "&" : "?";
+            return `${rawSignup}${separator}ref=${encodeURIComponent(refId)}`;
         }
 
-        function buildInviteMessage(refId, refUrl) {
-            return [
-                "MGSML SKY PROJECT - Official Invitation",
-                "",
-                `Sponsor / Referral ID: ${refId}`,
-                "",
-                "Step 1: Download and install the MGSML SKY Android app first.",
-                "Step 2: Sign up and enter the Sponsor / Referral ID above.",
-                "",
-                `Invite Link: ${refUrl}`
-            ].join("\n");
+        // অ্যাডমিন প্যানেল থেকে সেট করা মেসেজ টেমপ্লেটে রেফারেল আইডি ও লিংক বসানো
+        function buildInviteMessage(refId, shareLink) {
+            let template = (affiliateConfig.inviteTemplate || defaultInviteTemplate).trim();
+            if (!template) {
+                template = defaultInviteTemplate;
+            }
+
+            let formatted = template
+                .replace(/\{\{REF_ID\}\}/gi, refId)
+                .replace(/\{\{LINK\}\}/gi, shareLink)
+                .replace(/\{\{URL\}\}/gi, shareLink);
+
+            // অ্যাডমিন যদি {{LINK}} ট্যাগ দিতে ভুলে যান, তাহলে শেষে লিংক যুক্ত করে দেয়
+            if (!template.toUpperCase().includes("{{LINK}}") && !template.toUpperCase().includes("{{URL}}") && !formatted.includes(shareLink)) {
+                formatted = `${formatted}\n\nSign Up Link: ${shareLink}`;
+            }
+
+            return formatted;
         }
 
         function refreshUI() {
             activeRefId = resolveReferralId();
-            const refUrl = buildReferralUrl(activeRefId);
-            const inviteText = buildInviteMessage(activeRefId, refUrl);
+            const signupRefUrl = buildSignupReferralUrl(activeRefId);
+            const inviteText = buildInviteMessage(activeRefId, signupRefUrl);
+            const encodedText = encodeURIComponent(inviteText);
+            const encodedUrl = encodeURIComponent(signupRefUrl);
 
             document.getElementById("displayRefId").textContent = activeRefId;
-            document.getElementById("referralLinkInput").value = refUrl;
+            document.getElementById("referralLinkInput").value = signupRefUrl;
             document.getElementById("inviteMessageBox").value = inviteText;
+
+            document.getElementById("whatsappDirectLink").href = `https://api.whatsapp.com/send?text=${encodedText}`;
+            document.getElementById("telegramDirectLink").href = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
 
             document.getElementById("adminDownloadUrl").value = affiliateConfig.appDownloadUrl || "";
             document.getElementById("adminSignupUrl").value = affiliateConfig.signupUrl || defaultConfig.signupUrl;
             document.getElementById("adminCustomRefId").value = affiliateConfig.customRefId || "";
+            document.getElementById("adminInviteTemplate").value = affiliateConfig.inviteTemplate || defaultInviteTemplate;
 
             document.getElementById("affiliateAdminPanel").style.display = isAdminLoggedIn() ? "block" : "none";
         }
@@ -615,13 +736,11 @@
             }
 
             statusBox.style.display = "none";
-            window.open(dlUrl, "_blank");
+            window.location.href = dlUrl;
         }
 
         function handleSignupClick() {
-            const rawSignup = (affiliateConfig.signupUrl || defaultConfig.signupUrl).trim();
-            const separator = rawSignup.includes("?") ? "&" : "?";
-            const finalSignupUrl = `${rawSignup}${separator}ref=${encodeURIComponent(activeRefId)}`;
+            const finalSignupUrl = buildSignupReferralUrl(activeRefId);
             window.location.href = finalSignupUrl;
         }
 
@@ -635,23 +754,38 @@
         }
 
         async function shareInvite() {
-            const text = document.getElementById("inviteMessageBox").value;
-            const refUrl = document.getElementById("referralLinkInput").value;
+            const text = document.getElementById("inviteMessageBox").value.trim();
+            if (!text) {
+                showToast("Invite message is empty");
+                return;
+            }
 
+            // Sketchware Android Bridge থাকলে সরাসরি কল করুন
+            if (window.AndroidShare && typeof window.AndroidShare.shareText === "function") {
+                try {
+                    window.AndroidShare.shareText(text);
+                    return;
+                } catch (e) {}
+            }
+
+            // ব্রাউজার / সাপোর্টেড WebView-তে Native Share Sheet
             if (navigator.share) {
                 try {
                     await navigator.share({
                         title: "MGSML SKY PROJECT Invite",
-                        text: text,
-                        url: refUrl
+                        text: text
                     });
                     return;
                 } catch (err) {
+                    if (err && err.name === "AbortError") return;
                 }
             }
 
-            const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-            window.open(waUrl, "_blank");
+            // Fallback: মেসেজ ক্লিপবোর্ডে কপি করে সরাসরি WhatsApp শেয়ার লিংকে নিয়ে যাওয়া
+            copyText(text, "Message copied! Opening WhatsApp...");
+            setTimeout(() => {
+                window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            }, 350);
         }
 
         function copyText(value, successMessage) {
@@ -669,7 +803,9 @@
             temp.value = value;
             document.body.appendChild(temp);
             temp.select();
-            document.execCommand("copy");
+            try {
+                document.execCommand("copy");
+            } catch (e) {}
             document.body.removeChild(temp);
             showToast(successMessage);
         }
@@ -682,10 +818,21 @@
             affiliateConfig.appDownloadUrl = document.getElementById("adminDownloadUrl").value.trim();
             affiliateConfig.signupUrl = document.getElementById("adminSignupUrl").value.trim() || defaultConfig.signupUrl;
             affiliateConfig.customRefId = document.getElementById("adminCustomRefId").value.trim().toUpperCase();
+            affiliateConfig.inviteTemplate = document.getElementById("adminInviteTemplate").value;
 
             localStorage.setItem(CONFIG_KEY, JSON.stringify(affiliateConfig));
             refreshUI();
-            showToast("Affiliate settings saved");
+
+            if (firebaseDbRef) {
+                firebaseDbRef.set(affiliateConfig)
+                    .then(() => showToast("Saved to Firebase & synced"))
+                    .catch((err) => {
+                        console.warn("Firebase save error:", err);
+                        showToast("Saved locally (check Firebase rules)");
+                    });
+            } else {
+                showToast("Settings saved (add FIREBASE_CONFIG for cloud sync)");
+            }
         }
 
         function resetAffiliateSettings() {
@@ -697,7 +844,14 @@
             localStorage.removeItem("mgsml_last_ref_id");
             affiliateConfig = Object.assign({}, defaultConfig);
             refreshUI();
-            showToast("Reset to default settings");
+
+            if (firebaseDbRef) {
+                firebaseDbRef.set(affiliateConfig)
+                    .then(() => showToast("Reset & synced to Firebase"))
+                    .catch((err) => console.warn(err));
+            } else {
+                showToast("Reset to default settings");
+            }
         }
 
         let toastTimer = null;
@@ -711,7 +865,10 @@
             }, 2400);
         }
 
-        window.addEventListener("DOMContentLoaded", refreshUI);
+        window.addEventListener("DOMContentLoaded", () => {
+            refreshUI();
+            initFirebaseSync();
+        });
     </script>
 </body>
 </html>
